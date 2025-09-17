@@ -1,0 +1,73 @@
+# 钓鱼网站检测系统配置
+
+app:
+  name: "Phishing Detector"
+  version: "1.0.0"
+  debug: false
+  host: "0.0.0.0"
+  port: 5000
+
+database:
+  type: "mysql"
+  host: "192.168.1.246"
+  port: 3306
+  name: "phishing_detector"
+  user: "root"
+  password: "3646287"
+  pool_size: 20
+  max_overflow: 30
+
+redis:
+  host: "192.168.1.246"
+  port: 6379
+  db: 0
+  password: null
+
+data_collection:
+  max_pages_per_domain: 100
+  request_timeout: 30
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  max_redirects: 5
+  follow_redirects: true
+  verify_ssl: false
+
+feature_extraction:
+  extract_html_features: true
+  extract_http_headers: true
+  extract_javascript: true
+  extract_css: true
+  extract_meta_tags: true
+  calculate_similarity: true
+  extract_fingerprint: true
+
+model:
+  algorithm: "ensemble"  # ensemble, random_forest, xgboost, neural_network
+  feature_selection: true
+  cross_validation_folds: 5
+  test_size: 0.2
+  random_state: 42
+  hyperparameter_tuning: true
+
+monitoring:
+  enable_metrics: true
+  metrics_port: 8000
+  log_level: "INFO"
+  log_format: "json"
+
+security:
+  api_key_required: false
+  rate_limit: "100/hour"
+  max_request_size: "10MB"
+
+training:
+  batch_size: 32
+  epochs: 100
+  early_stopping_patience: 10
+  save_best_only: true
+  validation_split: 0.2
+
+feature_flags:
+  enable_real_time_detection: true
+  enable_batch_processing: true
+  enable_model_retraining: true
+  enable_feature_importance: true

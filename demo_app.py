@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-简化的钓鱼网站检测器
+钓鱼网站检测系统 - 完整版本
+包含详细弹窗分析、安全评分、风险评分等功能
 """
 
 from flask import Flask, request, jsonify, render_template_string
@@ -9,11 +10,12 @@ import re
 import urllib.parse
 import time
 import random
+import json
 
 app = Flask(__name__)
 CORS(app)
 
-# 完整的HTML模板
+# 模板HTML
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -155,6 +157,16 @@ HTML_TEMPLATE = '''
             max-height: 80vh;
             overflow-y: auto;
             width: 90%;
+        }
+        .feature-analysis {
+            margin: 1rem 0;
+        }
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
         }
         .loading {
             text-align: center;
@@ -447,8 +459,9 @@ def index():
 def health_check():
     return jsonify({
         'status': 'healthy',
-        'message': '钓鱼网站检测器API正在运行',
-        'version': '1.0.0'
+        'message': '钓鱼网站检测系统API正在运行',
+        'version': '2.0.0',
+        'timestamp': time.time()
     })
 
 @app.route('/api/detect', methods=['POST'])
@@ -467,19 +480,16 @@ def detect_phishing():
         risk_score = calculate_risk_score(url)
         confidence = random.uniform(0.8, 0.95)
 
-        # 确定风险等级和消息
+        # 确定风险等级
         if risk_score < 0.3:
             risk_level = "低风险"
             message = "此网站看起来是安全的"
-            status = "✅ 网站安全"
         elif risk_score < 0.6:
             risk_level = "中风险"
             message = "此网站存在一些风险因素"
-            status = "⚡ 存在风险"
         else:
             risk_level = "高风险"
             message = "此网站可能是钓鱼网站"
-            status = "⚠️ 钓鱼网站"
 
         return jsonify({
             'url': url,
@@ -487,7 +497,6 @@ def detect_phishing():
             'confidence': confidence,
             'risk_level': risk_level,
             'message': message,
-            'status': status,
             'is_phishing': risk_score > 0.6,
             'analysis_time': time.time(),
             'features': {
